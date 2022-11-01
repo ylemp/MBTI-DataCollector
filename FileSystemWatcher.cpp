@@ -1,5 +1,9 @@
 #include "FileSystemWatcher.h"
 
+/**
+ * FileSystemWatcher class watches a directory for changes in files
+ * @param directory Directory for detection of new files
+ */
 FileSystemWatcher::FileSystemWatcher(fs::path directory) :  detectionFolder_(std::move(directory)) {
 
     if(!is_directory(detectionFolder_)){
@@ -16,6 +20,10 @@ FileSystemWatcher::FileSystemWatcher(fs::path directory) :  detectionFolder_(std
     }
 }
 
+/**
+ * Runs the FileSystemWatcher
+ * @param triggerEvent Functor to handle the actions done on a file
+ */
 void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)> &triggerEvent) {
 
     while(watching_){
@@ -64,16 +72,27 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
     }
 }
 
+/**
+ * Stops the FileSystemWatcher
+ */
 void FileSystemWatcher::stop() {
     watching_ = false;
 
 }
 
+/**
+ * helper function to check if a key exists in the file system map
+ * @param key
+ * @return true if the key value pair exists
+ */
 bool FileSystemWatcher::contains(const std::string &key) {
     auto el = existingFiles_.find(key);
     return el != existingFiles_.end();
 }
 
+/**
+ * Destructor, stops the FileSystemWatcher
+ */
 FileSystemWatcher::~FileSystemWatcher() {
     stop();
 }

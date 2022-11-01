@@ -8,7 +8,14 @@ using namespace std;
 namespace fs = filesystem;
 
 
-
+/**
+ * Service that collects system information upon reception of a trigger event
+ * The trigger event is raised when existence of a file with a certain name in a specified directory is detected.
+ *
+ * @param detectionFolder Detection Folder to detect creation of a file
+ * @param collectionFolder Collection folder recursively collects individual files, as well as whole directories and their contents
+ * @param archiveFolder Folder to store the copied files and tar files
+ */
 DataCollector::DataCollector(fs::path  detectionFolder, fs::path  collectionFolder, fs::path  archiveFolder) :
                              detectionFolder_(std::move(detectionFolder)),
                              collectionFolder_(std::move(collectionFolder)),
@@ -30,9 +37,12 @@ DataCollector::DataCollector(fs::path  detectionFolder, fs::path  collectionFold
         std::filesystem::create_directories(archiveFolder_);
     }
 
-    //collect();
 }
 
+/**
+ * Collect function passes a lambda function to the FileSystemWatcher
+ * Allows for customizable handling of file system events
+ */
 void DataCollector::collect() {
     //pass a lambda to the start function of File System Watcher
     fileSystemWatcher_.start([this] (const std::string& fileName, FileStatus status) -> void {
@@ -54,6 +64,12 @@ void DataCollector::collect() {
 
 }
 
+/**
+ * Calls functions to copy and tar the collectionFolder into the archiveFolder
+ * Creates a unique timestamp that is shared between the tar file and backup folder
+ * @param collectionFolder Input folder for data collection
+ * @param archiveFolder Output folder for archival of files
+ */
 void DataCollector::archiveDirectory(const filesystem::path& collectionFolder, const filesystem::path& archiveFolder) {
     cout << "Archiving Directory" << endl;
 
@@ -63,7 +79,12 @@ void DataCollector::archiveDirectory(const filesystem::path& collectionFolder, c
     tarDirectory(collectionFolder, archiveFolder, timestamp);
 }
 
-
+/**
+ * Copies the source dir to the destination dir under the backups directory with unique timestamps
+ * @param source Input folder for data collection
+ * @param destination Output folder for archival of files
+ * @param timestamp Time of folder creation
+ */
 void DataCollector::copyDirectory(const filesystem::path& source, filesystem::path destination, std::time_t& timestamp) {
 
     destination /= "backups";
@@ -77,6 +98,12 @@ void DataCollector::copyDirectory(const filesystem::path& source, filesystem::pa
     fs::copy(source, destination, fs::copy_options::recursive);
 }
 
+/**
+ * Tars the source dir to the destination dir under the tars directory with unique timestamps
+ * @param source Input folder for data collection
+ * @param destination Output folder for archival of files
+ * @param timestamp Time of tar creation
+ */
 void DataCollector::tarDirectory(const filesystem::path& source, filesystem::path destination, std::time_t& timestamp) {
 
     destination /= "tars";
@@ -93,20 +120,28 @@ void DataCollector::tarDirectory(const filesystem::path& source, filesystem::pat
     system(z.c_str());
 }
 
+/**
+ * Destructor, stops the FileSystemWatcher
+ */
 DataCollector::~DataCollector() {
     fileSystemWatcher_.stop();
 }
 
 
 
-
+/**
+ * Entry point for the application
+ * @param argc Argument count
+ * @param argv Argument list
+ * @return int
+ */
 int main(int argc, char* argv[])
 {
 	cout << "The number of provided args is: " << argc << endl;
 
 	if (argc != 4) {
         cout << "You have provided an incorrect number of arguments " << argc << endl;
-        return 0;
+        return -1;
 	}
 
     cout << "arg[0]: " << argv[0] << endl;

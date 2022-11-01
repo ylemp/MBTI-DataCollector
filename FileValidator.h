@@ -6,6 +6,11 @@
 #include <sstream>
 #include <regex>
 
+/**
+ * Determines if the inputted file name is a valid lz4 file name
+ * @param fileName File to be analyzed
+ * @return true if the file is a valid .lz4 file
+ */
 static bool isValidLz4(const std::string& fileName){
     //std::cout << "Checking File " << fileName << std::endl;
 
