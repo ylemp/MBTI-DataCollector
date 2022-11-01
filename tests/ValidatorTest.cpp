@@ -33,3 +33,8 @@ TEST(ValidatorTests, ValidatorTestNoHexValues){
     EXPECT_FALSE(isValidLz4(file));
 }
 
+TEST(ValidatorTests, ValidatorTestEmpty){
+
+    string file = "";
+    EXPECT_FALSE(isValidLz4(file));
+}

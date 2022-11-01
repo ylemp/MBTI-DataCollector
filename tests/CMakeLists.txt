@@ -1,22 +1,27 @@
-project(Test)
+project(DataCollectorTests)
 
 include(CTest)
 
 
 set(SOURCES
-        "ValidatorTest.cpp"
-)
+        ValidatorTest.cpp
+        FileSystemWatcherTest.cpp
+        DataCollectorTest.cpp)
 
 add_executable(DataCollectorTests ${SOURCES})
 
-target_link_libraries(DataCollectorTests PUBLIC gtest_main)
+target_link_libraries(DataCollectorTests PUBLIC
+        DataCollector_lib
+        gtest_main)
 
 add_test(
         NAME ValidatorTests
-        COMMAND ValidatorTests
-)
+        COMMAND ValidatorTests)
 
+add_test(
+        NAME FileSystemWatcherTests
+        COMMAND FileSystemWatcherTests)
 
-#set(test_SRCS ADD ALL TEST SOURCE FILES HERE)
-#add_executable(runUnitTests gtest.cpp ${test_SRCS})
-#target_link_libraries(runUnitTests gtest gmock core)
+add_test(
+        NAME DataCollectorTests
+        COMMAND DataCollectorTests)
