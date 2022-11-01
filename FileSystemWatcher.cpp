@@ -50,6 +50,7 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
             //so, it's new
             if(contains(fileName.path().string())){
                 if(existingFiles_[fileName.path().string()] != lastWriteTime){
+                    existingFiles_[fileName.path().string()] = std::filesystem::last_write_time(fileName);
                     triggerEvent(fileName.path().string(), FileStatus::updated);
                 }
             }else{
