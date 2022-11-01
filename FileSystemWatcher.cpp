@@ -41,7 +41,6 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
             }
         }
 
-
         //creations or modifications
         //look through file system
         //if the file exists in the filesystem and in our map, check if it has been modified
@@ -67,7 +66,6 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
                     triggerEvent(fileName.path().string(), FileStatus::created);
                 }
             }
-
         }
     }
 }
@@ -77,7 +75,6 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
  */
 void FileSystemWatcher::stop() {
     watching_ = false;
-
 }
 
 /**

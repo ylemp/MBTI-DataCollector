@@ -36,7 +36,6 @@ DataCollector::DataCollector(fs::path  detectionFolder, fs::path  collectionFold
         //not necessarily an error, we can make the archive folder
         std::filesystem::create_directories(archiveFolder_);
     }
-
 }
 
 /**
@@ -61,7 +60,6 @@ void DataCollector::collect() {
                 cerr << "File Status Error" << endl;
         }
     });
-
 }
 
 /**

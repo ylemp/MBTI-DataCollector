@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../DataCollector.h"
+#include <thread>
 
 using namespace std;
 
@@ -13,5 +14,3 @@ TEST(DataCollectorTests, DataCollectorTest){
     DataCollector dataCollector = DataCollector(detectionFolder, collectionFolder, archiveFolder);
     EXPECT_TRUE(true);
 }
-
-
