@@ -5,14 +5,35 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("DataCollector")
 
-#add_subdirectory(Google_tests)
-#add_subdirectory(tests)
+enable_testing()
+
+
+
+
+
+set(HEADERS
+        "DataCollector.h"
+        "FileSystemWatcher.h"
+        "FileValidator.h"
+)
+
+set(SOURCES
+        "DataCollector.cpp"
+        "FileSystemWatcher.cpp"
+)
+
 
 # Add source to this project's executable.
-add_executable (DataCollector "DataCollector.cpp" "DataCollector.h" FileSystemWatcher.h FileSystemWatcher.cpp FileValidator.h)
+#add_executable (DataCollector "DataCollector.cpp" "DataCollector.h" FileSystemWatcher.h FileSystemWatcher.cpp FileValidator.h)
+add_executable(DataCollector ${SOURCES} ${HEADERS})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET DataCollector PROPERTY CXX_STANDARD 17)
 endif()
 
-install(TARGETS DataCollector DESTINATION .)
+install(TARGETS DataCollector DESTINATION bin)
+
+add_library(DataCollector_lib STATIC ${SOURCES} ${HEADERS})
+
+add_subdirectory(Google_tests)
+add_subdirectory(tests)
