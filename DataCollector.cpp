@@ -34,7 +34,7 @@ DataCollector::DataCollector(fs::path  detectionFolder, fs::path  collectionFold
     if(!is_directory(archiveFolder_)){
         cout << "archiveFolder directory is being created" << endl;
         //not necessarily an error, we can make the archive folder
-        std::filesystem::create_directories(archiveFolder_);
+        fs::create_directories(archiveFolder_);
     }
 }
 
@@ -44,11 +44,11 @@ DataCollector::DataCollector(fs::path  detectionFolder, fs::path  collectionFold
  */
 void DataCollector::collect() {
     //pass a lambda to the start function of File System Watcher
-    fileSystemWatcher_.start([this] (const std::string& fileName, FileStatus status) -> void {
+    fileSystemWatcher_.start([this] (const std::string& fileName, FileStatus status, std::time_t writeTime) -> void {
         switch (status) {
             case FileStatus::created:
                 cout << "File " << fileName << " has been created in the File System" << endl;
-                archiveDirectory(collectionFolder_, archiveFolder_);
+                archiveDirectory(collectionFolder_, archiveFolder_, writeTime);
                 break;
             case FileStatus::updated:
                 cout << "File " << fileName << " has been updated in the File System" << endl;
@@ -68,13 +68,11 @@ void DataCollector::collect() {
  * @param collectionFolder Input folder for data collection
  * @param archiveFolder Output folder for archival of files
  */
-void DataCollector::archiveDirectory(const filesystem::path& collectionFolder, const filesystem::path& archiveFolder) {
+void DataCollector::archiveDirectory(const filesystem::path& collectionFolder, const filesystem::path& archiveFolder, const std::time_t& writeTime) {
     cout << "Archiving Directory" << endl;
 
-    std::time_t timestamp = std::time(nullptr);
-
-    copyDirectory(collectionFolder, archiveFolder, timestamp);
-    tarDirectory(collectionFolder, archiveFolder, timestamp);
+    copyDirectory(collectionFolder, archiveFolder, writeTime);
+    tarDirectory(collectionFolder, archiveFolder, writeTime);
 }
 
 /**
@@ -83,17 +81,21 @@ void DataCollector::archiveDirectory(const filesystem::path& collectionFolder, c
  * @param destination Output folder for archival of files
  * @param timestamp Time of folder creation
  */
-void DataCollector::copyDirectory(const filesystem::path& source, filesystem::path destination, std::time_t& timestamp) {
+void DataCollector::copyDirectory(const filesystem::path& source, filesystem::path destination, const std::time_t& timestamp) {
 
     destination /= "backups";
     if(!exists(destination)){
-        std::filesystem::create_directories(destination);
+        fs::create_directories(destination);
     }
 
     destination /= "backup_";
     destination += to_string(timestamp);
 
-    fs::copy(source, destination, fs::copy_options::recursive);
+    try {
+        fs::copy(source, destination, fs::copy_options::recursive);
+    }catch (exception e ){
+        cerr << e.what() << endl;
+    }
 }
 
 /**
@@ -102,11 +104,11 @@ void DataCollector::copyDirectory(const filesystem::path& source, filesystem::pa
  * @param destination Output folder for archival of files
  * @param timestamp Time of tar creation
  */
-void DataCollector::tarDirectory(const filesystem::path& source, filesystem::path destination, std::time_t& timestamp) {
+void DataCollector::tarDirectory(const filesystem::path& source, filesystem::path destination, const std::time_t& timestamp) {
 
     destination /= "tars";
     if(!exists(destination)){
-        std::filesystem::create_directories(destination);
+        fs::create_directories(destination);
     }
 
     destination /= "archive_";

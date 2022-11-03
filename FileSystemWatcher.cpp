@@ -15,7 +15,7 @@ FileSystemWatcher::FileSystemWatcher(fs::path directory) :  detectionFolder_(std
         if(fileName.is_regular_file() && isValidLz4(fileName.path().filename().string())) {
             std::cout << "\tFileSystemWatcher Adding File: " << fileName << std::endl;
             //add the fully justified path in case of duplicate file names in sub dirs
-            existingFiles_[fileName.path().string()] = std::filesystem::last_write_time(fileName);
+            existingFiles_[fileName.path().string()] = fs::last_write_time(fileName);
         }
     }
 }
@@ -24,7 +24,7 @@ FileSystemWatcher::FileSystemWatcher(fs::path directory) :  detectionFolder_(std
  * Runs the FileSystemWatcher
  * @param triggerEvent Functor to handle the actions done on a file
  */
-void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)> &triggerEvent) {
+void FileSystemWatcher::start(const std::function<void(std::string, FileStatus, std::time_t)> &triggerEvent) {
 
     while(watching_){
         std::this_thread::sleep_for(sleep_);
@@ -35,20 +35,21 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
         //then it has been deleted
         //remove it from the map
         for(auto const& pair : existingFiles_){
-            if (!std::filesystem::exists(pair.first)) {
-                triggerEvent(pair.first, FileStatus::deleted);
+            if (!fs::exists(pair.first)) {
+                triggerEvent(pair.first, FileStatus::deleted, std::time(nullptr));
                 existingFiles_.erase(pair.first);
             }
         }
+
 
         //creations or modifications
         //look through file system
         //if the file exists in the filesystem and in our map, check if it has been modified
         //if the file doesn't exist in our map then it is new
-        for(auto &fileName : std::filesystem::recursive_directory_iterator(detectionFolder_)) {
+        for(auto &fileName : fs::recursive_directory_iterator(detectionFolder_)) {
 
             //record last write time to compare
-            auto lastWriteTime = std::filesystem::last_write_time(fileName);
+            auto lastWriteTime = fs::last_write_time(fileName);
 
             //we already have the file in our map
             //compare write times
@@ -57,13 +58,13 @@ void FileSystemWatcher::start(const std::function<void(std::string, FileStatus)>
             //so, it's new
             if(contains(fileName.path().string())){
                 if(existingFiles_[fileName.path().string()] != lastWriteTime){
-                    existingFiles_[fileName.path().string()] = std::filesystem::last_write_time(fileName);
-                    triggerEvent(fileName.path().string(), FileStatus::updated);
+                    existingFiles_[fileName.path().string()] = fs::last_write_time(fileName);
+                    triggerEvent(fileName.path().string(), FileStatus::updated, std::time(nullptr));
                 }
             }else{
                 if(fileName.is_regular_file() && isValidLz4(fileName.path().filename().string())) {
                     existingFiles_[fileName.path().string()] = lastWriteTime;
-                    triggerEvent(fileName.path().string(), FileStatus::created);
+                    triggerEvent(fileName.path().string(), FileStatus::created, std::time(nullptr));
                 }
             }
         }
