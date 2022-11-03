@@ -15,24 +15,14 @@ int main(int argc, char* argv[])
 {
     CLI::App app{"App description"};
 
-    std::string flagFilenameD = "Detection";
+    std::string flagFilenameD;
     app.add_option("-d,--detect", flagFilenameD, "The Detection folder")->required(true);
 
-    std::string flagFilenameC = "Collection";
+    std::string flagFilenameC;
     app.add_option("-c,--collect", flagFilenameC, "The Collection folder")->required(true);
 
-    std::string flagFilenameA = "Archive";
+    std::string flagFilenameA;
     app.add_option("-a,--archive", flagFilenameA, "The Archive folder")->required(true);
-
-
-    if(!flagFilenameD.empty()){
-        cout << "flagFilenameD: " << flagFilenameD << endl;
-    }
-    if(!flagFilenameC.empty()){
-        cout << "flagFilenameC: " << flagFilenameC << endl;
-    }if(!flagFilenameA.empty()){
-        cout << "flagFilenameA: " << flagFilenameA << endl;
-    }
 
     try{
         CLI11_PARSE(app, argc, argv);
