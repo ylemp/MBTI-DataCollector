@@ -8,6 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project ("DataCollector")
 
+if(NOT DEFINED CLI11_DIR)
+  set (CLI11_DIR "CLI11-main" CACHE STRING "CLI11 git repository")
+endif()
+
+include_directories(${CLI11_DIR}/include)
+add_subdirectory(CLI11-main)
+target_link_libraries(CLI11)
+
 enable_testing()
 
 set(HEADERS

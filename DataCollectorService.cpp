@@ -1,4 +1,5 @@
 #include "DataCollector.h"
+#include "CLI11.hpp"
 
 using namespace std;
 
@@ -12,32 +13,43 @@ namespace fs = filesystem;
  */
 int main(int argc, char* argv[])
 {
-    cout << "The number of provided args is: " << argc << endl;
+    CLI::App app{"App description"};
 
-    if (argc != 4) {
-        cout << "You have provided an incorrect number of arguments " << argc << endl;
-        return -1;
+    std::string flagFilenameD = "Detection";
+    app.add_option("-d,--detect", flagFilenameD, "The Detection folder")->required(true);
+
+    std::string flagFilenameC = "Collection";
+    app.add_option("-c,--collect", flagFilenameC, "The Collection folder")->required(true);
+
+    std::string flagFilenameA = "Archive";
+    app.add_option("-a,--archive", flagFilenameA, "The Archive folder")->required(true);
+
+
+    if(!flagFilenameD.empty()){
+        cout << "flagFilenameD: " << flagFilenameD << endl;
+    }
+    if(!flagFilenameC.empty()){
+        cout << "flagFilenameC: " << flagFilenameC << endl;
+    }if(!flagFilenameA.empty()){
+        cout << "flagFilenameA: " << flagFilenameA << endl;
     }
 
-    cout << "arg[0]: " << argv[0] << endl;
-    cout << "arg[1]: " << argv[1] << endl;
-    cout << "arg[2]: " << argv[2] << endl;
-    cout << "arg[3]: " << argv[3] << endl;
+    try{
+        CLI11_PARSE(app, argc, argv);
 
-    fs::path detectionFolder(argv[1]);
-    fs::path collectionFolder(argv[2]);
-    fs::path archiveFolder(argv[3]);
+        fs::path detectionFolder(flagFilenameD);
+        fs::path collectionFolder(flagFilenameC);
+        fs::path archiveFolder(flagFilenameA);
 
-    cout << detectionFolder << endl;
-    cout << collectionFolder << endl;
-    cout << archiveFolder << endl;
-
-    try {
         DataCollector dc = DataCollector(detectionFolder, collectionFolder, archiveFolder);
         dc.collect();
+
+    }catch (CLI::ParseError e){
+        app.exit(e);
     }catch (invalid_argument& e){
         cerr << e.what() << endl;
         return -1;
     }
+
     return 0;
 }
